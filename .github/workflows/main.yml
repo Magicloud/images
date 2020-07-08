@@ -1,0 +1,30 @@
+name: Magicloud's Docker Images
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Login
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: echo "${GITHUB_TOKEN}" | docker login -u "${GITHUB_ACTOR}" --password-stdin docker.pkg.github.com
+    - name: Build
+      run: |
+        for i in */; do
+          cd "${i}"
+          tag="docker.pkg.github.com/magicloud/images/${i%/}:${GITHUB_SHA:0:7}"
+          docker build -t "${tag}" .
+        done
+    - name: Publish
+      run: |
+        for i in */; do
+          cd "${i}"
+          tag="docker.pkg.github.com/magicloud/images/${i%/}:${GITHUB_SHA:0:7}"
+          docker push "${tag}"
+        done
+
