@@ -20,7 +20,7 @@ jobs:
         for i in */; do
           (cd "${i}"
           tag="docker.pkg.github.com/magicloud/images/${i%/}:${GITHUB_SHA:0:7}"
-          docker build -t "${tag}" .)
+          docker build -t "${tag}" --build-arg the_host=${{ secrets.THE_HOST }} .)
         done
 
     - name: Publish
